@@ -1,0 +1,75 @@
+name: Owner Validation
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  validation:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+
+      # Step 3: Install dependencies (Axios for API requests)
+      - name: Install dependencies
+        run: npm install axios
+
+      # Step 4: Get the first file in the PR
+      - name: Get the first file in the PR
+        id: get_file
+        run: |
+          # Get the list of changed files in the PR
+          FILE_NAME=$(curl -s \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" | \
+            jq -r '.[0].filename')
+
+          echo "FILE_NAME=$FILE_NAME" >> $GITHUB_ENV
+          echo "File to be processed: $FILE_NAME"
+
+      # Step 5: Validate the owner field
+      - name: Validate owner field
+        run: |
+          # Read the content of the first file in the PR
+          owner_data=$(cat ${{ env.FILE_NAME }})
+
+          # Extract the 'owner' field from the file
+          owner=$(echo "$owner_data" | jq -r '.owner')
+
+          # Validate that the 'owner' field exists
+          if [[ ! "$owner" || ! "$owner.email" || ! "$owner.repo" ]]; then
+            echo "Invalid owner structure. Missing 'email' or 'repo'."
+            exit 1
+          fi
+
+          # Extract the email and repo fields
+          email=$(echo "$owner" | jq -r '.email')
+          repo_url=$(echo "$owner" | jq -r '.repo')
+
+          # Validate the email format (basic validation using regex)
+          if [[ ! "$email" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
+            echo "Invalid email format: $email"
+            exit 1
+          fi
+
+          # Validate if the GitHub repository exists by making an API request
+          repo_response=$(curl -s -o /dev/null -w "%{http_code}" "https://api.github.com/repos/$repo_url")
+
+          # Check if the repository exists (response code 200)
+          if [[ "$repo_response" -ne 200 ]]; then
+            echo "Repository '$repo_url' does not exist or is inaccessible. Response code: $repo_response"
+            exit 1
+          fi
+
+          echo "Owner email is valid and the repository exists."
