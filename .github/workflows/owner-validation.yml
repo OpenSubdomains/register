@@ -58,17 +58,20 @@ jobs:
           repo_url=$(echo "$owner" | jq -r '.repo')
 
           # Validate the email format (basic validation using regex)
-          if [[ ! "$email" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
+          if [[ ! "$email" =~ ^[a-zA-Z0-9._%+-]+@[a-zAZ0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
             echo "Invalid email format: $email"
             exit 1
           fi
 
+          # Extract owner/repo from the repo URL (strip the 'https://github.com/' prefix)
+          repo_owner_repo=$(echo "$repo_url" | sed 's|https://github.com/||')
+
           # Validate if the GitHub repository exists by making an API request
-          repo_response=$(curl -s -o /dev/null -w "%{http_code}" "https://api.github.com/repos/$repo_url")
+          repo_response=$(curl -s -o /dev/null -w "%{http_code}" "https://api.github.com/repos/$repo_owner_repo")
 
           # Check if the repository exists (response code 200)
           if [[ "$repo_response" -ne 200 ]]; then
-            echo "Repository '$repo_url' does not exist or is inaccessible. Response code: $repo_response"
+            echo "Repository '$repo_owner_repo' does not exist or is inaccessible. Response code: $repo_response"
             exit 1
           fi
 
