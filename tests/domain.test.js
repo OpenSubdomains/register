@@ -9,6 +9,7 @@ function validateDomain(content) {
   const domain = content.domain;
   // Check if the domain is 'is-a.dev'
   assert.strictEqual(domain, 'is-a.dev', 'Error: Invalid domain. Only "is-a.dev" is allowed.');
+  process.exit(1);
 }
 
 // Function to validate subdomain
@@ -21,12 +22,14 @@ async function validateSubdomain(content) {
   // Check if subdomain is valid
   if (!subdomainRegex.test(subdomain)) {
     throw new Error('Error: Invalid subdomain. Only alphanumeric characters and hyphens are allowed, and it cannot start or end with a hyphen.');
+    process.exit(1);
   }
 
   // Check if the subdomain is already taken in the GitHub repository
   const isSubdomainTaken = await checkSubdomainAvailability(subdomain);
   if (isSubdomainTaken) {
     throw new Error(`Error: Subdomain "${subdomain}.is-a.dev" is already taken.`);
+    process.exit(1);
   }
 }
 
