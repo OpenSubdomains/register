@@ -1,0 +1,76 @@
+name: Records Validation
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  validation:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+
+      # Step 3: Install dependencies (Axios for API requests)
+      - name: Install dependencies
+        run: npm install axios
+
+      # Step 4: Get the first file in the PR
+      - name: Get the first file in the PR
+        id: get_file
+        run: |
+          # Get the list of changed files in the PR
+          FILE_NAME=$(curl -s \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" | \
+            jq -r '.[0].filename')
+
+          echo "FILE_NAME=$FILE_NAME" >> $GITHUB_ENV
+          echo "File to be processed: $FILE_NAME"
+
+      # Step 5: Validate the records table and CNAME field
+      - name: Validate records table and CNAME
+        run: |
+          # Read the content of the first file in the PR
+          record_data=$(cat ${{ env.FILE_NAME }})
+
+          # Extract the 'record' field from the file
+          record=$(echo "$record_data" | jq -r '.record')
+
+          # Validate the record structure
+          if [[ ! "$record" || ! "$record.CNAME" ]]; then
+            echo "Invalid record structure. 'CNAME' field is missing."
+            exit 1
+          fi
+
+          # Extract the CNAME value
+          cname=$(echo "$record" | jq -r '.CNAME')
+
+          # Check if CNAME contains 'https://' or '/'
+          if [[ "$cname" == *"https://"* || "$cname" == *"/"* ]]; then
+            echo "Invalid CNAME: '$cname'. It should not contain 'https://' or any '/'"
+            exit 1
+          fi
+
+          # Validate if the domain is accessible
+          response=$(curl -s -o /dev/null -w "%{http_code}" "$cname")
+
+          # If the response code is not 200 or 404, fail the workflow
+          if [[ "$response" -ge 400 && "$response" -ne 404 ]]; then
+            echo "CNAME '$cname' is not accessible. Response code: $response"
+            exit 1
+          fi
+
+          # If we pass all checks, the workflow will succeed
+          echo "CNAME '$cname' is valid and accessible."
+
