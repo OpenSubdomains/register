@@ -3,7 +3,6 @@ name: Bug Report
 about: Create a report to help us improve
 title: 'What bug did you encounter?'
 labels: bug
-assignees: '@support'
 ---
 
 ### Your Subdomain and Domain
