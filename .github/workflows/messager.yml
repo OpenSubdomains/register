@@ -1,0 +1,77 @@
+name: Wait for All Checks
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  wait_for_checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Wait until all checks are done
+      - name: Wait until all checks are done
+        id: wait_checks
+        run: |
+          # Loop to check the status of the checks until they are all completed
+          while true; do
+            # Get the list of status checks for the current PR
+            status_checks=$(curl -s \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/status" | jq -r '.statuses')
+            
+            # Check if all checks have a status other than "pending"
+            pending_checks=$(echo "$status_checks" | jq -r 'select(.state == "pending")')
+
+            if [ -z "$pending_checks" ]; then
+              echo "All checks are complete."
+              break
+            else
+              echo "Waiting for checks to complete..."
+              sleep 10  # Wait 30 seconds before checking again
+            fi
+          done
+
+      # Step 3: Determine the status of all checks and send a comment in the PR
+      - name: Check PR status and send message in PR
+        run: |
+          # Fetch the status checks of the PR
+          status_checks=$(curl -s \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/status" | jq -r '.statuses')
+
+          # Check if all checks passed
+          failed_checks=$(echo "$status_checks" | jq -r 'select(.state == "failure")')
+          if [ -z "$failed_checks" ]; then
+            echo "All checks passed. Sending success message in PR."
+            # Send success message to PR
+            curl -X POST \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -d '{"body": "All checks passed for PR #${{ github.event.pull_request.number }}!"}' \
+              "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
+          else
+            # If there are failures, check if any specific check failed and send an appropriate message
+            specific_failed_check=$(echo "$failed_checks" | jq -r '.context')
+            if [ -n "$specific_failed_check" ]; then
+              echo "Some checks failed. Specific check that failed: $specific_failed_check."
+              # Send a failure message indicating which check failed
+              curl -X POST \
+                -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                -d '{"body": "PR #${{ github.event.pull_request.number }} has failed the check: '"$specific_failed_check"'. Please fix the issue and update your PR."}' \
+                "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
+            else
+              echo "All checks failed."
+              # Send a general failure message
+              curl -X POST \
+                -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                -d '{"body": "PR #${{ github.event.pull_request.number }} has failed all checks. Please check the CI logs for more details."}' \
+                "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
+            fi
+          fi
