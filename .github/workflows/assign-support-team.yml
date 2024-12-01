@@ -1,0 +1,17 @@
+name: Assign to Support Team for Bug Issues
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  assign:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if issue has 'bug' label
+        if: contains(github.event.issue.labels.*.name, 'bug')
+        uses: peter-evans/assign-issue@v2
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          assignees: 'support'
