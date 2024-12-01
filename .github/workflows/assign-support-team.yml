@@ -1,4 +1,4 @@
-name: Assign to Support Team for Bug Issues
+name: Assign to Support Team for All Issues
 
 on:
   issues:
@@ -14,7 +14,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Check if issue has 'bug' label and assign to support team
-        if: contains(github.event.issue.labels.*.name, 'bug')
+      - name: Assign the support team to the issue
         run: |
           gh issue edit ${{ github.event.issue.number }} --add-assignee @OpenSubdomains/support
