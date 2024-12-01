@@ -25,71 +25,41 @@ jobs:
         run: npm install axios
 
       # Step 4: Run domain and subdomain validation
-      - name: Run domain and subdomain validation
+      - name: Run subdomain validation
         run: |
-          # Validation script
+          # Read the subdomain data from the file (adjust path if needed)
+          subdomain_data=$(cat subdomain_info.json)
+
+          # Extract the subdomain from the JSON data
+          subdomain=$(echo "$subdomain_data" | jq -r '.subdomain')
+
+          # Check if the subdomain exists by calling GitHub API
           node -e "
-          const assert = require('assert');
-          const axios = require('axios');
+            const axios = require('axios');
+            const subdomain = '$subdomain';
+            const GITHUB_API_BASE_URL = 'https://api.github.com/repos/is-a-dev/register/contents/domains';
+            const fs = require('fs');
 
-          // GitHub API base URL for the repository
-          const GITHUB_API_BASE_URL = 'https://api.github.com/repos/is-a-dev/register/contents/domains';
-
-          // Function to handle errors and exit
-          function handleError(message) {
-            console.error(\`Validation Error: \${message}\`);
-            process.exit(1); // Exit with failure
-          }
-
-          // Function to validate the domain
-          function validateDomain(domain) {
-            try {
-              assert.strictEqual(domain, 'is-a.dev', 'Invalid domain. Only \\"is-a.dev\\" is allowed.');
-            } catch (error) {
-              handleError(error.message);
-            }
-          }
-
-          // Function to validate subdomain
-          async function validateSubdomain(subdomain) {
-            const subdomainRegex = /^[a-zA-Z0-9-]+$/;
-            try {
-              if (!subdomainRegex.test(subdomain) || subdomain.startsWith('-') || subdomain.endsWith('-')) {
-                throw new Error(
-                  'Invalid subdomain. Only alphanumeric characters and hyphens are allowed, and it cannot start or end with a hyphen.'
-                );
+            async function checkSubdomainAvailability(subdomain) {
+              try {
+                const response = await axios.get(\`\${GITHUB_API_BASE_URL}/\${subdomain}.json\`);
+                if (response.data) {
+                  console.error('Subdomain \\"' + subdomain + '\\" is already taken.');
+                  process.exit(1); // Exit with failure if subdomain is taken
+                }
+              } catch (error) {
+                if (error.response && error.response.status === 404) {
+                  console.log('Subdomain \\"' + subdomain + '\\" is available.');
+                } else {
+                  console.error('Error checking subdomain availability:', error.message);
+                  process.exit(1);
+                }
               }
-
-              // Check if the subdomain is already taken
-              const isTaken = await checkSubdomainAvailability(subdomain);
-              if (isTaken) {
-                throw new Error(\`Subdomain \\"\${subdomain}.is-a.dev\\" is already taken.\`);
-              }
-            } catch (error) {
-              handleError(error.message);
             }
-          }
 
-          // Function to check subdomain availability by querying the GitHub API
-          async function checkSubdomainAvailability(subdomain) {
-            try {
-              const response = await axios.get(\`\${GITHUB_API_BASE_URL}/\${subdomain}.json\`);
-              return response.data && response.data.name ? true : false; // Subdomain is taken
-            } catch (error) {
-              if (error.response && error.response.status === 404) {
-                return false; // Subdomain is available
-              }
-              throw new Error(\`Error checking subdomain availability: \${error.message}\`);
-            }
-          }
-
-          // Example inputs (Replace these with actual PR data or inputs)
-          const domain = 'is-a.dev';  // Replace with actual domain if dynamic
-          const subdomain = 'example-subdomain'; // Replace with actual subdomain from PR context
-
-          // Run the validations
-          validateDomain(domain);
-          validateSubdomain(subdomain)
-            .then(() => console.log('Validation succeeded'))
-            .catch(() => process.exit(1));
+            // Validate subdomain availability
+            checkSubdomainAvailability(subdomain);
           "
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
