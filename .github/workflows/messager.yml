@@ -1,4 +1,4 @@
-name: Send Message to PR
+name: Send PR Message
 
 on:
   pull_request:
@@ -7,18 +7,21 @@ on:
       - synchronize
       - reopened
 
+permissions:
+  pull-requests: write
+
 jobs:
   send_message:
     runs-on: ubuntu-latest
-
     steps:
-      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Send message to the pull request
       - name: Send message to PR
         uses: thollander/actions-comment-pull-request@v3
         with:
           message: |
-            Hello world !
+            Hello world ! :wave:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          mode: upsert
+          create-if-not-exists: true
