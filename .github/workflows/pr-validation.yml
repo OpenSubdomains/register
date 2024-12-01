@@ -1,0 +1,31 @@
+name: PR Validation
+
+on:
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  validation:
+    runs-on: ubuntu-latest  # The operating system the job will run on
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'  # Specify the Node.js version you want to use
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm install  # This will install the dependencies from your package.json file
+
+      # Step 4: Run the domain validation tests
+      - name: Run domain validation tests
+        run: node tests/domain.test.js  # Specify the path to the domain.test.js file
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Required for accessing GitHub API
