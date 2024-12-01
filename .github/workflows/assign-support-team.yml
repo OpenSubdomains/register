@@ -9,9 +9,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check if issue has 'bug' label
-        if: contains(github.event.issue.labels.*.name, 'bug')
-        uses: peter-evans/assign-issue@v2
+      - name: Set up GitHub CLI
+        uses: cli/cli@v3
         with:
-          issue-number: ${{ github.event.issue.number }}
-          assignees: 'support'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Check if issue has 'bug' label and assign to support team
+        if: contains(github.event.issue.labels.*.name, 'bug')
+        run: |
+          gh issue edit ${{ github.event.issue.number }} --add-assignee @OpenSubdomains/support
