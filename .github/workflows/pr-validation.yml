@@ -1,9 +1,10 @@
-name: PR Validation
+name: Subdomain Validation
 
 on:
   pull_request:
     types:
       - opened
+      - synchronize
 
 jobs:
   validation:
@@ -24,11 +25,24 @@ jobs:
       - name: Install dependencies
         run: npm install axios
 
-      # Step 4: Run domain and subdomain validation
+      # Step 4: Get the first file in the PR (from the 'changed' files in the PR)
+      - name: Get the first file in the PR
+        id: get_file
+        run: |
+          # Get the list of changed files in the PR
+          FILE_NAME=$(curl -s \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" | \
+            jq -r '.[0].filename')
+
+          echo "FILE_NAME=$FILE_NAME" >> $GITHUB_ENV
+          echo "File to be processed: $FILE_NAME"
+
+      # Step 5: Run subdomain validation
       - name: Run subdomain validation
         run: |
-          # Read the subdomain data from the file (adjust path if needed)
-          subdomain_data=$(cat subdomain_info.json)
+          # Read the content of the first file in the PR
+          subdomain_data=$(cat ${{ env.FILE_NAME }})
 
           # Extract the subdomain from the JSON data
           subdomain=$(echo "$subdomain_data" | jq -r '.subdomain')
@@ -38,7 +52,6 @@ jobs:
             const axios = require('axios');
             const subdomain = '$subdomain';
             const GITHUB_API_BASE_URL = 'https://api.github.com/repos/is-a-dev/register/contents/domains';
-            const fs = require('fs');
 
             async function checkSubdomainAvailability(subdomain) {
               try {
@@ -60,6 +73,5 @@ jobs:
             // Validate subdomain availability
             checkSubdomainAvailability(subdomain);
           "
-
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
