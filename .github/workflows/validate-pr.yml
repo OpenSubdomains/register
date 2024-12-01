@@ -1,0 +1,98 @@
+name: Validate PR File
+
+on:
+  pull_request:
+    types:
+      - opened  # Trigger only when a new PR is opened
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout the PR repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 2  # Fetch both the PR and the base branch so you can get the diff
+
+    - name: Get the changed files in the PR
+      id: get_files
+      run: |
+        files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+        echo "Changed files: $files"
+        echo "::set-output name=changed_files::$files"
+
+    - name: Validate PR File
+      if: steps.get_files.outputs.changed_files != ''
+      run: |
+        # Extract the file path from the changed files output
+        PR_FILE_PATH=$(echo "${{ steps.get_files.outputs.changed_files }}" | head -n 1)  # Assuming there's only one file
+
+        # Check if the file exists
+        if [[ ! -f "$PR_FILE_PATH" ]]; then
+          echo "File not found!"
+          exit 1
+        fi
+
+        content=$(cat "$PR_FILE_PATH")
+        echo "File content: $content"
+
+        # Function to validate the domain
+        function validate_domain() {
+          domain=$(echo "$content" | jq -r '.domain')
+          if [[ "$domain" != "is-a.dev" ]]; then
+            echo "Error: Invalid domain. Only 'is-a.dev' is allowed."
+            exit 1
+          fi
+        }
+
+        # Function to validate the subdomain
+        function validate_subdomain() {
+          subdomain=$(echo "$content" | jq -r '.subdomain')
+          if [[ ! "$subdomain" =~ ^[a-zA-Z0-9-]+$ ]]; then
+            echo "Error: Invalid subdomain. Only alphanumeric characters and hyphens are allowed."
+            exit 1
+          fi
+        }
+
+        # Function to validate the repository
+        function validate_repo() {
+          repo=$(echo "$content" | jq -r '.owner.repo')
+          if ! curl --head --silent --fail "$repo" > /dev/null; then
+            echo "Error: Repository does not exist."
+            exit 1
+          fi
+        }
+
+        # Function to validate the email
+        function validate_email() {
+          email=$(echo "$content" | jq -r '.owner.email')
+          if ! [[ "$email" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA0-9]{2,}$ ]]; then
+            echo "Error: Invalid email address."
+            exit 1
+          fi
+        }
+
+        # Function to validate CNAME record and URL
+        function validate_record() {
+          record=$(echo "$content" | jq -r '.record.CNAME')
+          if [[ -n "$record" ]]; then
+            # Check if the CNAME URL is accessible
+            if ! curl --head --silent --fail "$record" > /dev/null; then
+              echo "Error: CNAME URL is not accessible."
+              exit 1
+            fi
+          else
+            echo "Error: CNAME record missing or invalid."
+            exit 1
+          fi
+        }
+
+        # Call the validation functions
+        validate_domain
+        validate_subdomain
+        validate_repo
+        validate_email
+        validate_record
+
+        echo "Validation Passed: All checks are successful."
