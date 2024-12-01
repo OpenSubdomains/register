@@ -16,3 +16,7 @@ jobs:
           repo-token: ${{ secrets.MY_PERSONAL_ACCESS_TOKEN }}
           teams: support
           numOfAssignee: 1
+          abortIfPreviousAssignees: false
+          removePreviousAssignees: false
+          allowNoAssignees: false
+          allowSelfAssign: true
