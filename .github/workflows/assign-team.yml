@@ -14,4 +14,4 @@ jobs:
               uses: pozil/auto-assign-issue@v2
               with:
                   repo-token: ${{ secrets.ISSUE_MANAGER_TOKEN }}
-                  teams: triage
+                  teams: support
