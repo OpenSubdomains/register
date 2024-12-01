@@ -6,7 +6,8 @@
 
 <h1 align="center">OpenSubdomains</h1>
 
-<p align="center"><strong>OpenSubdomains</strong> is a service that allows developers to get a sweet-looking domain for their personal websites.</p>
+<p align="center"><strong>OpenSubdomains</strong> is a service that helps developers get clean and professional-looking domains for their personal websites.</p>
+<p align="center"><strong>Inspired by</strong> these amazing services: <a href="https://github.com/is-a-dev">is-a.dev</a> and <a href="https://github.com/open-domains">Open Domains</a>.</p>
 
 ---
 
