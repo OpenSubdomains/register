@@ -14,10 +14,17 @@
 ## 🚀 Register a Domain
 
 Follow these steps to register your domain:
+1. **Authorize the OAuth App:**
+- Why?
+  - Authorizing the OAuth App allows for seamless integration and ensures that you have the necessary permissions to fork the repository and create a pull request directly from your GitHub account. It simplifies      the process while maintaining security.
+- How?
+  - Go to the [GitHub OAuth App Authorization page]().
+  - Click **Authorize Application** and follow the instructions to grant the required permissions.
+  - Once authorized, the app will have access to fork the repository and create pull requests on your behalf.
 
-1. **Star this repository.**
-2. **Fork this repository.**
-3. **Add your subdomain to the `domains/` directory** in a new file named `<your-subdomain>.json`. Ensure your file follows this structure:
+2. **Star this repository.**
+3. **Fork this repository.**
+4. **Add your subdomain to the `domains/` directory** in a new file named `<your-subdomain>.json`. Ensure your file follows this structure:
    ```json
    {
       "domain": "is-a.dev",
@@ -30,8 +37,8 @@ Follow these steps to register your domain:
          "CNAME": "your-github-pages-url"
       }
    }
-4. **Create a pull request with your changes.**
-5. **Wait for approval and watch your domain go live! 🎉**
+5. **Create a pull request with your changes.**
+6. **Wait for approval and watch your domain go live! 🎉**
 
 ## ℹ️ Domains
 | Available Domains |
