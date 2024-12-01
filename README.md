@@ -42,5 +42,3 @@ OpenSubdomains is licensed under the [GPL-3.0 license](https://github.com/OpenSu
 
 ## 🆘 Issue
 If you have any problems, feel free to [open an issue](https://github.com/OpenSubdomains/register/issues/new/choose).
-
-If you have an issue that contains confidental infomation, send an email to contact@theveryheavy.is-a.dev.
