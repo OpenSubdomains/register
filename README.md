@@ -41,7 +41,7 @@ Follow these steps to register your domain:
 8. **Login and find your domain (subdomain)**
 9. **Click validate button and watch your domain go live! 🎉**
 
-## NOTICE
+## !NOTICE!
 This service is still in maintence, so nothing will be accepted at this moment
 
 ## 📄 License
