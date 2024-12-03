@@ -40,31 +40,8 @@ Follow these steps to register your domain:
 5. **Create a pull request with your changes.**
 6. **Wait for approval and watch your domain go live! 🎉**
 
-## ℹ️ Domains
-| Available Domains |
-|:-:|
-| [`*.is-a-dev`](https://is-a.dev) |
-
-## ⚙️ Settings
-| Setting                                                        | [`is-a.dev`](https://is-a.dev)  |
-|---------------------------------------------------------------|--------------------------------|
-| PSL                                                           | ✅                             |
-| [DNSSEC][dnssec]                                               | ✅                             |
-| Email                                                         | ✅                             |
-| SSL/TLS*                                                      | [Full][ssl-full]               |
-| Always Use HTTPS*                                             | ✅                             |
-| HTTP Strict Transport Security (HSTS)                         | ✅                             |
-| Minimum TLS Version*                                          | 1.2                            |
-| Opportunistic Encryption, TLS 1.3*                            | ✅                             |
-| WAF (Web Application Firewall)*                               | Medium Security Level          |
-| Browser Integrity Check*                                       | ✅                             |
-
-[dnssec]:https://developers.cloudflare.com/dns/additional-options/dnssec
-[ssl-full]:https://developers.cloudflare.com/ssl/origin-configuration/ssl-modes/full
-
----
-## 🤝 Contribute
-We're always looking for contributors! Whether it's improving the documentation or adding features, feel free to get involved.
+## NOTICE
+This service is still in maintence, so nothing will be accepted at this moment
 
 ## 📄 License
 OpenSubdomains is licensed under the [GPL-3.0 license](https://github.com/OpenSubdomains/register/blob/main/LICENSE).
