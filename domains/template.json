@@ -1,1 +1,11 @@
-
+{
+   "domain": "is-a.dev",
+   "subdomain": "example",
+   "owner": {
+      "repo": "https://github.com/OpenSubdomains/website",
+      "email": "theheavy.fiverr@gmail.com"
+   },
+   "record": {
+      "CNAME": "none"
+   }
+}
