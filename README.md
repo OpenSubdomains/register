@@ -14,13 +14,11 @@
 ## 🚀 Register a Domain
 
 Follow these steps to register your domain:
-1. **Authorize the OAuth App:**
-- Why?
-  - Authorizing the OAuth App allows for seamless integration and ensures that you have the necessary permissions to fork the repository and create a pull request directly from your GitHub account. It simplifies      the process while maintaining security.
+1. **Create your account at our service:**
 - How?
-  - Go to the [GitHub OAuth App Authorization page]().
-  - Click **Authorize Application** and follow the instructions to grant the required permissions.
-  - Once authorized, the app will have access to fork the repository and create pull requests on your behalf.
+  - Go to [this website](https://osd.rweb.site/).
+  - Click **Login with GitHub** and follow the instructions to grant the required permissions.
+  - Once authorized, you will gain access to your domains (subdomains), etc.
 
 2. **Star this repository.**
 3. **Fork this repository.**
@@ -38,7 +36,10 @@ Follow these steps to register your domain:
       }
    }
 5. **Create a pull request with your changes.**
-6. **Wait for approval and watch your domain go live! 🎉**
+6. **Wait for approval**
+7. **When you got approved, go back to our [website](https://osd.rweb.site/)**
+8. **Login and find your domain (subdomain)**
+9. **Click validate button and watch your domain go live! 🎉**
 
 ## NOTICE
 This service is still in maintence, so nothing will be accepted at this moment
