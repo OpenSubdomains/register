@@ -2,7 +2,7 @@
    "domain": "is-a.dev",
    "subdomain": "example",
    "owner": {
-      "repo": "https://github.com/OpenSubdomains/website",
+      "repo": "https://github.com/theveryheavy/portfolio",
       "email": "theheavy.fiverr@gmail.com"
    },
    "record": {
