@@ -18,31 +18,16 @@ Follow these steps to register your domain:
 - How?
   - Go to [this website](https://osd.rweb.site/).
   - Click **Login with GitHub** and follow the instructions to grant the required permissions.
-  - Once authorized, you will gain access to your domains (subdomains), etc.
+  - Once authorized, you will gain access to your admin panel, etc.
 
-2. **Star this repository.**
-3. **Fork this repository.**
-4. **Add your subdomain to the `domains/` directory** in a new file named `<your-subdomain>.json`. Ensure your file follows this structure:
-   ```json
-   {
-      "domain": "is-a.dev",
-      "subdomain": "example",
-      "owner": {
-         "repo": "https://github.com/your-repo",
-         "email": "your-email@example.com"
-      },
-      "record": {
-         "CNAME": "your-github-pages-url"
-      }
-   }
-5. **Create a pull request with your changes.**
+5. **Create a domain.**
 6. **Wait for approval**
 7. **When you got approved, go back to our [website](https://osd.rweb.site/)**
 8. **Login and find your domain (subdomain)**
 9. **Click validate button and watch your domain go live! 🎉**
 
-## !NOTICE!
-This service is still in maintence, so nothing will be accepted at this moment
+## ⚠️ Notice
+This service is currently under maintenance, and we are not accepting submissions at this time.
 
 ## 📄 License
 OpenSubdomains is licensed under the [GPL-3.0 license](https://github.com/OpenSubdomains/register/blob/main/LICENSE).
